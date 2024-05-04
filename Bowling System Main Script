@@ -1,0 +1,400 @@
+local datastoreservice = game:GetService("DataStoreService") -- Gets Data Store Service
+local BallsStore = datastoreservice:GetDataStore("Balls.") -- Creates a data stpre
+game.Players.PlayerAdded:Connect(function(Player) -- Detects When A Player Enters The Game
+	Player.CharacterAppearanceLoaded:Connect(function(character) -- Detects When A Players Appearence Loads
+		for i , v in pairs(character:GetDescendants()) do -- Goes Through All Of The Players Character
+			if v:IsA("BasePart") or v:IsA("UnionOperation") or v:IsA("MeshPart") then -- Checks If Its A Part That Casts Shadow
+				v.CastShadow = false -- Disables Cast Shadow
+			end -- This Statement Went Through All Of A Characters Desendence Casting Shadows And Disables All Their Shadows
+		end -- This Statement Got All Of The Decendents Of The Player
+	end) -- This Function Disables A Players Shadow
+	local leaderstats = Instance.new("Folder") -- Creates A Folder Named leaderstats 
+	leaderstats.Name = "leaderstats" -- Names The Folder leaderstats
+	leaderstats.Parent = Player	-- Puts The Folder Inside The Player
+	local BowledBalls = Instance.new("IntValue") -- Creates A Value Named Bowled Balls
+	BowledBalls.Parent = leaderstats -- Sets The Values Parent To leaderstats
+	BowledBalls.Name = "Bowled" -- names the value "Bowled"
+	local Score = Instance.new("IntValue") -- Creates A Value Named Score
+	Score.Parent = leaderstats -- Sets The Values Parent To leaderstats
+	Score.Name = "Score" -- Names The Value Score
+	local data -- Sets A Variable Named data
+	local success, errormessage = pcall(function() -- Tries To Get The Data From Roblox"s Servers
+		data = BallsStore:GetAsync(Player.UserId.."-Bowled") -- Gets The Data And Sets It To The Data Value
+	end) -- Ends The Function
+
+	if success then -- Checks If It Worked
+		BowledBalls.Value = data -- Sets The BowledBalls Value To The Data Value
+		if data == nil then -- If The Player Has Never Played it fires this
+			BowledBalls.Value = 0 -- Sets The Value To 0
+		end -- This Made Sure the value was not nil
+	end -- This Made Sure The Data Loaded Properly
+	local success, errormessage = pcall(function() -- Tries To Get Data From Roblox"s Servers
+		data = BallsStore:GetAsync(Player.UserId.."-Score") -- Gets The Data And Sets It To The Data Vale
+	end) -- Ends The Function
+
+	if success then -- Checks If it worked
+		Score.Value = data -- Sets The Score Value To The Data Value
+		if data == nil then -- If the player has never Played it fires this
+			Score.Value = 0 -- Sets The Value to 0
+		end -- This Made Sure The Score Value Is Not Nil
+	end -- This Made Sure The Data Loaded Properly
+end) -- This Has Disabled Players CastShadow, Created A Folder Named leaderstats, And Created 2 Values Named Bowled And Score, Then Loaded The Data Of Them
+
+game.Players.PlayerRemoving:Connect(function(Plr) -- When The Player Leaves It Fires This
+	local success, errormessage = pcall(function() -- Tries To Save The Data To Roblox's Servers
+		BallsStore:SetAsync(Plr.UserId.."-Bowled", Plr.leaderstats.Bowled.Value) -- Saves The Bowled Value
+	end) -- Ends The Function Saving The Bowled Value
+	local success, errormessage = pcall(function() -- Tries To Save The Data To Roblox's Servers
+		BallsStore:SetAsync(Plr.UserId.."-Score", Plr.leaderstats.Score.Value) -- Saved The Score Value
+	end) -- Ends The Function Saving The Score Value
+end) -- Saves The Data When The Player Leaves
+local BadgeService = game:GetService("BadgeService") -- Gets The Badge Service -- Disclamer These Badges Dont Give Cuz I Havent Actualy Made The Badge If You Implement Your Own Badge Id It Will Work
+local PlaceHolderBadge1 = 1 -- Lets A Player Set a 1st Placeholder Badge Id
+local PlaceHolderBadge2 = 2 -- Lets A Player Set a 2nd Placeholder Badge Id
+local PlaceHolderBadge3 = 3 -- Lets A Player Set a 3rd Placeholder Badge Id
+local PlaceHolderBadge4 = 4 -- Lets A Player Set a 4th Placeholder Badge Id
+local PlaceHolderBadge5 = 5 -- Lets A Player Set a 5th Placeholder Badge Id
+game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power,Spin) -- Fires When The Fills Out The The Fourm
+	local Spin = Spin * 2 -- Makes The Spin Value Bigger
+	local Power = power * 2 -- Makes The Power Value Bigger
+	if Player.leaderstats.Bowled.Value <= 5 then -- Checks If The Player Has A Amount Bowled To Give The Player A Ball1
+		local Ball = game.ServerStorage.Ball1:Clone() -- Clones Ball1
+		Ball.Parent = game.Workspace.ActiveBalls -- Sets The Cloned Balls parent To Active Balls(A Folder in workspace)
+		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
+		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
+		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
+			wait(2) -- Waits 2 Seconds
+			Ball.Smoke2.Enabled = true -- Enables Smoke
+			wait(2) -- Waits 2 Seconds
+			Ball:Destroy() -- Destroys Ball
+		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
+			Ball.Black.Enabled = true -- Enables Black Effects
+			Ball.Sound.Value = "SonicBoom" -- Plays Sonic boom -- Another Script Takes This Sound And Plays It
+		elseif power > 80 then -- Else If The Power Is Above 80 It Runs The Following Code
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 70 then -- else Power Is Above 70 It Runs The Following Code
+			Ball.Red.Enabled = true -- Plays Red Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 65 then -- Else If The Power Is Above 65 It Plays The Following Code
+			Ball.Orange.Enabled = true -- Then Orange Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire -- Another Script Takes This Sound And Plays It
+		elseif power > 60 then -- Else If The Power Is Above 60 It Runs The Following Code
+			Ball.Yellow.Enabled = true -- Plays Yellow Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 55 then -- Else If The Power Is Above 55 Then It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 50 then -- Else If The Power Is Above 50 It Runs The Following Code
+			Ball.Pink.Enabled = true -- Pink Partical Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 40 then -- Else If The Power Is Above 40 It Runs The Following Code
+			Ball.Green.Enabled = true -- Enables Green Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 30 then -- Else If The Power Is Above 30 It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Partical Effects -- Another Script Takes This Sound And Plays It
+		elseif power > 20 then -- Else If The Power Is Above 20 It Runs The Following Code
+			Ball.Purple.Enabled = true -- Purple Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 15 then -- Else If The Power Is Above 15 It Runs The Following Code
+			Ball.DeepBlue.Enabled = true -- Deep Blue Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 10 then -- Else If The Power Is Above 10 It Runs The Following Code
+			Ball.Blue.Enabled = true -- Plays Blue Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Effects Play
+		elseif power > 0 then -- If The Power Is Above Runs The Following Code
+			Ball.Cyan.Enabled = true -- Enables Cyan Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Sound Plays -- Another Script Takes This Sound And Plays It
+		end -- This Has Bowled A Ball And Played Partical Effects
+	elseif Player.leaderstats.Bowled.Value <= 10 then -- If The Player Has Bowled Less Than 10 Balls And More Than 5 Balls It Runs The Following Code
+		local Ball = game.ServerStorage.Ball2:Clone() -- Clones Ball 2
+		Ball.Parent = game.Workspace.ActiveBalls -- Sets The Cloned Balls parent To Active Balls(A Folder in workspace)
+		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
+		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
+		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
+			wait(2) -- Waits 2 Seconds
+			Ball.Smoke2.Enabled = true -- Enables Smoke
+			wait(2) -- Waits 2 Seconds
+			Ball:Destroy() -- Destroys Ball
+		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
+			Ball.Black.Enabled = true -- Enables Black Effects
+			Ball.Sound.Value = "SonicBoom" -- Plays Sonic boom -- Another Script Takes This Sound And Plays It
+		elseif power > 80 then -- Else If The Power Is Above 80 It Runs The Following Code
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 70 then -- else Power Is Above 70 It Runs The Following Code
+			Ball.Red.Enabled = true -- Plays Red Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 65 then -- Else If The Power Is Above 65 It Plays The Following Code
+			Ball.Orange.Enabled = true -- Then Orange Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire -- Another Script Takes This Sound And Plays It
+		elseif power > 60 then -- Else If The Power Is Above 60 It Runs The Following Code
+			Ball.Yellow.Enabled = true -- Plays Yellow Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 55 then -- Else If The Power Is Above 55 Then It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 50 then -- Else If The Power Is Above 50 It Runs The Following Code
+			Ball.Pink.Enabled = true -- Pink Partical Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 40 then -- Else If The Power Is Above 40 It Runs The Following Code
+			Ball.Green.Enabled = true -- Enables Green Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 30 then -- Else If The Power Is Above 30 It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Partical Effects -- Another Script Takes This Sound And Plays It
+		elseif power > 20 then -- Else If The Power Is Above 20 It Runs The Following Code
+			Ball.Purple.Enabled = true -- Purple Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 15 then -- Else If The Power Is Above 15 It Runs The Following Code
+			Ball.DeepBlue.Enabled = true -- Deep Blue Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 10 then -- Else If The Power Is Above 10 It Runs The Following Code
+			Ball.Blue.Enabled = true -- Plays Blue Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Effects Play
+		elseif power > 0 then -- If The Power Is Above Runs The Following Code
+			Ball.Cyan.Enabled = true -- Enables Cyan Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Sound Plays -- Another Script Takes This Sound And Plays It
+		end -- This Has Bowled A Ball And Played Partical Effects
+	elseif Player.leaderstats.Bowled.Value <= 25 then -- If The Player Has Less Than 25 Bowled And More Than 10 Bowled It Runs The Following Code
+		local Ball = game.ServerStorage.Ball3:Clone() -- Clones Ball3
+		Ball.Parent = game.Workspace.ActiveBalls -- Sets The Cloned Balls parent To Active Balls(A Folder in workspace)
+		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
+		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
+		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
+			wait(2) -- Waits 2 Seconds
+			Ball.Smoke2.Enabled = true -- Enables Smoke
+			wait(2) -- Waits 2 Seconds
+			Ball:Destroy() -- Destroys Ball
+		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
+			Ball.Black.Enabled = true -- Enables Black Effects
+			Ball.Sound.Value = "SonicBoom" -- Plays Sonic boom -- Another Script Takes This Sound And Plays It
+		elseif power > 80 then -- Else If The Power Is Above 80 It Runs The Following Code
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 70 then -- else Power Is Above 70 It Runs The Following Code
+			Ball.Red.Enabled = true -- Plays Red Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 65 then -- Else If The Power Is Above 65 It Plays The Following Code
+			Ball.Orange.Enabled = true -- Then Orange Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire -- Another Script Takes This Sound And Plays It
+		elseif power > 60 then -- Else If The Power Is Above 60 It Runs The Following Code
+			Ball.Yellow.Enabled = true -- Plays Yellow Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 55 then -- Else If The Power Is Above 55 Then It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 50 then -- Else If The Power Is Above 50 It Runs The Following Code
+			Ball.Pink.Enabled = true -- Pink Partical Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 40 then -- Else If The Power Is Above 40 It Runs The Following Code
+			Ball.Green.Enabled = true -- Enables Green Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 30 then -- Else If The Power Is Above 30 It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Partical Effects -- Another Script Takes This Sound And Plays It
+		elseif power > 20 then -- Else If The Power Is Above 20 It Runs The Following Code
+			Ball.Purple.Enabled = true -- Purple Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 15 then -- Else If The Power Is Above 15 It Runs The Following Code
+			Ball.DeepBlue.Enabled = true -- Deep Blue Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 10 then -- Else If The Power Is Above 10 It Runs The Following Code
+			Ball.Blue.Enabled = true -- Plays Blue Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Effects Play
+		elseif power > 0 then -- If The Power Is Above Runs The Following Code
+			Ball.Cyan.Enabled = true -- Enables Cyan Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Sound Plays -- Another Script Takes This Sound And Plays It
+		end -- This Has Bowled A Ball And Played Partical Effects
+	elseif Player.leaderstats.Bowled.Value >= 50 then -- If The Players Bowled Balls Are Above 50 Than It runs The Following Code
+		local Ball = game.ServerStorage.Ball4:Clone() -- Clones Ball4
+		Ball.Parent = game.Workspace.ActiveBalls -- Sets The Cloned Balls parent To Active Balls(A Folder in workspace)
+		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
+		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
+		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
+			wait(2) -- Waits 2 Seconds
+			Ball.Smoke2.Enabled = true -- Enables Smoke
+			wait(2) -- Waits 2 Seconds
+			Ball:Destroy() -- Destroys Ball
+		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
+			Ball.Black.Enabled = true -- Enables Black Effects
+			Ball.Sound.Value = "SonicBoom" -- Plays Sonic boom -- Another Script Takes This Sound And Plays It
+		elseif power > 80 then -- Else If The Power Is Above 80 It Runs The Following Code
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 70 then -- else Power Is Above 70 It Runs The Following Code
+			Ball.Red.Enabled = true -- Plays Red Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 65 then -- Else If The Power Is Above 65 It Plays The Following Code
+			Ball.Orange.Enabled = true -- Then Orange Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire -- Another Script Takes This Sound And Plays It
+		elseif power > 60 then -- Else If The Power Is Above 60 It Runs The Following Code
+			Ball.Yellow.Enabled = true -- Plays Yellow Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 55 then -- Else If The Power Is Above 55 Then It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 50 then -- Else If The Power Is Above 50 It Runs The Following Code
+			Ball.Pink.Enabled = true -- Pink Partical Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 40 then -- Else If The Power Is Above 40 It Runs The Following Code
+			Ball.Green.Enabled = true -- Enables Green Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 30 then -- Else If The Power Is Above 30 It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Partical Effects -- Another Script Takes This Sound And Plays It
+		elseif power > 20 then -- Else If The Power Is Above 20 It Runs The Following Code
+			Ball.Purple.Enabled = true -- Purple Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 15 then -- Else If The Power Is Above 15 It Runs The Following Code
+			Ball.DeepBlue.Enabled = true -- Deep Blue Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 10 then -- Else If The Power Is Above 10 It Runs The Following Code
+			Ball.Blue.Enabled = true -- Plays Blue Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Effects Play
+		elseif power > 0 then -- If The Power Is Above Runs The Following Code
+			Ball.Cyan.Enabled = true -- Enables Cyan Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Sound Plays -- Another Script Takes This Sound And Plays It
+		end -- This Has Bowled A Ball And Played Partical Effects
+	elseif Player.leaderstats.Bowled.Value <= 100 then -- If The Player Has Less Than 100 Balls Bowled And More Than 50 Balls Bowled it runs The Following Code
+		local Ball = game.ServerStorage.Ball5:Clone() -- Clones Ball5
+		Ball.Parent = game.Workspace.ActiveBalls -- Sets The Cloned Balls parent To Active Balls(A Folder in workspace)
+		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
+		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
+		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
+			wait(2) -- Waits 2 Seconds
+			Ball.Smoke2.Enabled = true -- Enables Smoke
+			wait(2) -- Waits 2 Seconds
+			Ball:Destroy() -- Destroys Ball
+		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
+			Ball.Black.Enabled = true -- Enables Black Effects
+			Ball.Sound.Value = "SonicBoom" -- Plays Sonic boom -- Another Script Takes This Sound And Plays It
+		elseif power > 80 then -- Else If The Power Is Above 80 It Runs The Following Code
+			Ball.Fire.Enabled = true -- Enables Fire
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 70 then -- else Power Is Above 70 It Runs The Following Code
+			Ball.Red.Enabled = true -- Plays Red Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 65 then -- Else If The Power Is Above 65 It Plays The Following Code
+			Ball.Orange.Enabled = true -- Then Orange Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire -- Another Script Takes This Sound And Plays It
+		elseif power > 60 then -- Else If The Power Is Above 60 It Runs The Following Code
+			Ball.Yellow.Enabled = true -- Plays Yellow Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 55 then -- Else If The Power Is Above 55 Then It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 50 then -- Else If The Power Is Above 50 It Runs The Following Code
+			Ball.Pink.Enabled = true -- Pink Partical Effects Play
+			Ball.Sound.Value = "Fire" -- Plays Fire Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 40 then -- Else If The Power Is Above 40 It Runs The Following Code
+			Ball.Green.Enabled = true -- Enables Green Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 30 then -- Else If The Power Is Above 30 It Runs The Following Code
+			Ball.White.Enabled = true -- Plays White Partical Effects
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Partical Effects -- Another Script Takes This Sound And Plays It
+		elseif power > 20 then -- Else If The Power Is Above 20 It Runs The Following Code
+			Ball.Purple.Enabled = true -- Purple Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 15 then -- Else If The Power Is Above 15 It Runs The Following Code
+			Ball.DeepBlue.Enabled = true -- Deep Blue Partical Effects Play
+			Ball.Sound.Value = "Ice" -- Plays Ice Cracking Sound -- Another Script Takes This Sound And Plays It
+		elseif power > 10 then -- Else If The Power Is Above 10 It Runs The Following Code
+			Ball.Blue.Enabled = true -- Plays Blue Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Effects Play
+		elseif power > 0 then -- If The Power Is Above Runs The Following Code
+			Ball.Cyan.Enabled = true -- Enables Cyan Partical Effects
+			Ball.Sound.Value = "Ice" -- Ice Cracking Sound Plays -- Another Script Takes This Sound And Plays It
+		end -- This Has Bowled A Ball And Played Partical Effects
+	end -- This Has Bowled A Ball And Played Partical Effects For Every Level Of Ball
+	if Player.leaderstats.Bowled.Value == 5 then -- Checks If The Player Has Bowled 5 Balls
+		local OwnedBadge = BadgeService:UserHasBadgeAsync(Player.UserId, PlaceHolderBadge1) -- Checks If The Player Owns The Badge
+		if not OwnedBadge then -- If They Dont Own Badge it plays this
+			BadgeService:AwardBadge(Player.UserId, PlaceHolderBadge1) -- Awards Badge
+		end -- This Awarded A Player The Badge
+		elseif Player.leaderstats.Bowled.Value == 10 then -- Checks If The Player Has Bowled 10 Balls
+		local OwnedBadge = BadgeService:UserHasBadgeAsync(Player.UserId, PlaceHolderBadge2) -- Checks If The Player Owns The Badge
+		if not OwnedBadge then -- If They Dont Own Badge it plays this
+				BadgeService:AwardBadge(Player.UserId, PlaceHolderBadge2) -- Awards Badge
+		end -- This Awarded A Player The Badge
+		elseif Player.leaderstats.Bowled.Value == 25 then -- Checks If The Player Has Bowled 25 Balls
+		local OwnedBadge = BadgeService:UserHasBadgeAsync(Player.UserId, PlaceHolderBadge3) -- Checks If The Player Owns The Badge
+		if not OwnedBadge then -- If They Dont Own Badge it plays this
+			BadgeService:AwardBadge(Player.UserId, PlaceHolderBadge3) -- Awards Badge
+		end -- This Awarded A Player The Badge
+		elseif Player.leaderstats.Bowled.Value == 50 then -- Checks If The Player Has Bowled 50 Balls
+			local OwnedBadge = BadgeService:UserHasBadgeAsync(Player.UserId, PlaceHolderBadge4) -- Checks If The Player Owns The Badge
+			if not OwnedBadge then -- If They Dont Own Badge it plays this
+				BadgeService:AwardBadge(Player.UserId, PlaceHolderBadge4) -- Awards Badge
+		end -- This Awarded A Player The Badge
+		elseif Player.leaderstats.Bowled.Value == 100 then -- Checks If The Player Has Bowled 100 Balls
+		local OwnedBadge = BadgeService:UserHasBadgeAsync(Player.UserId, PlaceHolderBadge5) -- Checks If The Player Owns The Badge
+		if not OwnedBadge then -- If They Dont Own Badge it plays this
+				BadgeService:AwardBadge(Player.UserId, PlaceHolderBadge5) -- Awards Badge
+		end -- This Awarded A Player The Badge
+		end -- This Has Awarded All Of The Players The Badges
+	end) -- Ends The Function That Bowled All Of The Balls And Gave Them The Badges
+game.ReplicatedStorage.Reset.OnServerEvent:Connect(function() -- When The Player Presses Q It Plays This -- Comes From Another Local Script
+	workspace.Alley:Destroy() -- Destroys Alley In Workspace
+	local Alley = game.ServerStorage.Alley:Clone() -- Clones An Alley From Server Storage
+	Alley.Parent = workspace -- Sets The Alley's Parent To Workspace
+end)
+workspace.ActiveBalls.ChildAdded:Connect(function(ball) -- When The Folder That Holds The Balls Is Added To It Plays This
+	ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+				if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+					toutcher.CanTouch = false -- Disables The Pins Can Toutch
+					if ball.Name == "Ball1" then -- If The Ball Is Ball 1
+				local children = game.Players:GetChildren() -- Gets All The Players
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 10 -- Awards The Score
+				end -- This Awarded The Player Score Based On The Level Of Ball
+					end -- This Has Awarded The Player 10 Score If They Have Ball 1
+			if ball.Name == "Ball2" then -- If The Ball Is Ball 2
+				local children = game.Players:GetChildren() -- Gets All The Players
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 20 -- Awards The Score
+				end -- This Awarded The Player Score Based On The Level Of Ball
+			end -- This Has Awarded The Player 20 Score If They Have Ball 2
+			if ball.Name == "Ball3" then -- If The Ball Is Ball 3
+				local children = game.Players:GetChildren() -- Gets All The Players
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 30 -- Awards The Score
+				end -- This Awarded The Player Score Based On The Level Of Ball
+			end -- This Has Awarded The Player 30 Score If They Have Ball 3
+			if ball.Name == "Ball4" then -- If The Ball Is Ball 4
+				local children = game.Players:GetChildren() -- Gets All The Players
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 40 -- Awards The Score
+				end -- This Awarded The Player Score Based On The Level Of Ball
+			end -- This Has Awarded The Player 40 Score If They Have Ball 4
+			if ball.Name == "Ball5" then -- If The Ball Is Ball 5
+				local children = game.Players:GetChildren() -- Gets All The Players
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 50 -- Awards The Score
+				end -- This Awarded The Player Score Based On The Level Of Ball
+			end -- This Has Awarded The Player 50 Score If They Have Ball 5
+				end -- This Has Checked If The Toutcher Is A Pin And If It is it awards the players in the game score based on the ball level			
+	end) -- This Has Awarded The Player Score Based On The Level Of Ball
+end) -- This Has Awarded The Player Score
+-- Feel Free To Use This Script Although It Might Be Hard To Implement It Because There Are Alot Of Outside Things, Thanks For Reading This And Sorry For Misspelled Words, Grammer, And Capitalization Im Dislexic :P (Dislexia Is A Mental "Deficency" That Makes It Hard For Me To Do Launguage Oriented Things)
