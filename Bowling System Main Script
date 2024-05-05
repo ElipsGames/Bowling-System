@@ -1,4 +1,5 @@
 local datastoreservice = game:GetService("DataStoreService") -- Gets Data Store Service
+local MarketplaceService = game:GetService("MarketplaceService") -- Gets MarketPlaceService
 local BallsStore = datastoreservice:GetDataStore("Balls.") -- Creates a data stpre
 game.Players.PlayerAdded:Connect(function(Player) -- Detects When A Player Enters The Game
 	Player.CharacterAppearanceLoaded:Connect(function(character) -- Detects When A Players Appearence Loads
@@ -39,7 +40,6 @@ game.Players.PlayerAdded:Connect(function(Player) -- Detects When A Player Enter
 		end -- This Made Sure The Score Value Is Not Nil
 	end -- This Made Sure The Data Loaded Properly
 end) -- This Has Disabled Players CastShadow, Created A Folder Named leaderstats, And Created 2 Values Named Bowled And Score, Then Loaded The Data Of Them
-
 game.Players.PlayerRemoving:Connect(function(Plr) -- When The Player Leaves It Fires This
 	local success, errormessage = pcall(function() -- Tries To Save The Data To Roblox's Servers
 		BallsStore:SetAsync(Plr.UserId.."-Bowled", Plr.leaderstats.Bowled.Value) -- Saves The Bowled Value
@@ -63,13 +63,52 @@ game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power
 		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
 		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
 		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
-		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		local hasPass = false -- Makes A Value Named hasPass
+		local passID = 804124589 -- Sets The PassId
+		local Bowled = 1 -- Sets A Bowled Value
+		local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+			hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+		end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+		if hasPass == true then -- Checks If The Player Has The Pass
+		Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- This Doubled The Player The Bowled Value If They Got The Pass
+		if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+		Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- Doubled The bowled If The Player Has Premium
+		if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- If The Player Is In My Group It Multiplys
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + Bowled -- Adds To The Bowled Value
+		Ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+			if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+				toutcher.CanTouch = false -- Disables The Pins Can Toutch
+				local hasPass = false -- Makes A Value Named hasPass
+				local passID = 803810936 -- Sets The PassId
+				local Score = 10 -- Sets A Score Value
+				local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+					hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+				end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+				local children = game.Players:GetChildren() -- Gets All The Players
+				if hasPass == true then -- If The Player Has The Pass It Rewards The Player This
+					Score = Score * 2 -- Multiplys The Score
+				end -- Awards The Playe Score Pased On If They Had The pass Or Not
+				if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- Doubled The bowled If The Player Has Premium
+				if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- If The Player Is In My Group It Multiplys
+				for i = 1, #children do -- This Adds Score To All The Players
+				children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + Score -- Awards The Score
+				end -- This Awarded The Player Score
+				end -- This Has Awarded The Player Score
+		end) -- This Has Awarded The Player Score
 		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
 			Ball.Fire.Enabled = true -- Enables Fire
 			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball.Smoke2.Enabled = true -- Enables Smoke
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball:Destroy() -- Destroys Ball
 		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
 			Ball.Black.Enabled = true -- Enables Black Effects
@@ -117,13 +156,52 @@ game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power
 		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
 		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
 		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
-		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		local hasPass = false -- Makes A Value Named hasPass
+		local passID = 804124589 -- Sets The PassId
+		local Bowled = 1 -- Sets A Bowled Value
+		local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+			hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+		end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+		if hasPass == true then -- Checks If The Player Has The Pass
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- This Doubled The Player The Bowled Value If They Got The Pass
+		if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- Doubled The bowled If The Player Has Premium
+		if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- If The Player Is In My Group It Multiplys
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + Bowled -- Adds To The Bowled Value
+		Ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+			if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+				toutcher.CanTouch = false -- Disables The Pins Can Toutch
+				local hasPass = false -- Makes A Value Named hasPass
+				local passID = 803810936 -- Sets The PassId
+				local Score = 20 -- Sets A Score Value
+				local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+					hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+				end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+				local children = game.Players:GetChildren() -- Gets All The Players
+				if hasPass == true then -- If The Player Has The Pass It Rewards The Player This
+					Score = Score * 2 -- Multiplys The Score
+				end -- Awards The Playe Score Pased On If They Had The pass Or Not
+				if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- Doubled The bowled If The Player Has Premium
+				if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- If The Player Is In My Group It Multiplys
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + Score -- Awards The Score
+				end -- This Awarded The Player Score
+			end -- This Has Awarded The Player Score
+		end) -- This Has Awarded The Player Score
 		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
 			Ball.Fire.Enabled = true -- Enables Fire
 			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball.Smoke2.Enabled = true -- Enables Smoke
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball:Destroy() -- Destroys Ball
 		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
 			Ball.Black.Enabled = true -- Enables Black Effects
@@ -171,13 +249,52 @@ game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power
 		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
 		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
 		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
-		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		local hasPass = false -- Makes A Value Named hasPass
+		local passID = 804124589 -- Sets The PassId
+		local Bowled = 1 -- Sets A Bowled Value
+		local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+			hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+		end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+		if hasPass == true then -- Checks If The Player Has The Pass
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- This Doubled The Player The Bowled Value If They Got The Pass
+		if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- Doubled The bowled If The Player Has Premium
+		if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- If The Player Is In My Group It Multiplys
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + Bowled -- Adds To The Bowled Value
+		Ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+			if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+				toutcher.CanTouch = false -- Disables The Pins Can Toutch
+				local hasPass = false -- Makes A Value Named hasPass
+				local passID = 803810936 -- Sets The PassId
+				local Score = 40 -- Sets A Score Value
+				local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+					hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+				end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+				local children = game.Players:GetChildren() -- Gets All The Players
+				if hasPass == true then -- If The Player Has The Pass It Rewards The Player This
+					Score = Score * 2 -- Multiplys The Score
+				end -- Awards The Playe Score Pased On If They Had The pass Or Not
+				if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- Doubled The bowled If The Player Has Premium
+				if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- If The Player Is In My Group It Multiplys
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + Score -- Awards The Score
+				end -- This Awarded The Player Score
+			end -- This Has Awarded The Player Score
+		end) -- This Has Awarded The Player Score
 		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
 			Ball.Fire.Enabled = true -- Enables Fire
 			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball.Smoke2.Enabled = true -- Enables Smoke
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball:Destroy() -- Destroys Ball
 		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
 			Ball.Black.Enabled = true -- Enables Black Effects
@@ -225,13 +342,52 @@ game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power
 		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
 		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
 		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
-		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		local hasPass = false -- Makes A Value Named hasPass
+		local passID = 804124589 -- Sets The PassId
+		local Bowled = 1 -- Sets A Bowled Value
+		local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+			hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+		end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+		if hasPass == true then -- Checks If The Player Has The Pass
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- This Doubled The Player The Bowled Value If They Got The Pass
+		if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- Doubled The bowled If The Player Has Premium
+		if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- If The Player Is In My Group It Multiplys
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + Bowled -- Adds To The Bowled Value
+		Ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+			if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+				toutcher.CanTouch = false -- Disables The Pins Can Toutch
+				local hasPass = false -- Makes A Value Named hasPass
+				local passID = 803810936 -- Sets The PassId
+				local Score = 80 -- Sets A Score Value
+				local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+					hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+				end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+				local children = game.Players:GetChildren() -- Gets All The Players
+				if hasPass == true then -- If The Player Has The Pass It Rewards The Player This
+					Score = Score * 2 -- Multiplys The Score
+				end -- Awards The Playe Score Pased On If They Had The pass Or Not
+				if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- Doubled The bowled If The Player Has Premium
+				if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- If The Player Is In My Group It Multiplys
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + Score -- Awards The Score
+				end -- This Awarded The Player Score
+			end -- This Has Awarded The Player Score
+		end) -- This Has Awarded The Player Score
 		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
 			Ball.Fire.Enabled = true -- Enables Fire
 			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball.Smoke2.Enabled = true -- Enables Smoke
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball:Destroy() -- Destroys Ball
 		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
 			Ball.Black.Enabled = true -- Enables Black Effects
@@ -279,13 +435,52 @@ game.ReplicatedStorage.BowlingActive.OnServerEvent:Connect(function(Player,power
 		Ball.Position = Player.Character.PrimaryPart.Position + Player.Character.PrimaryPart.CFrame.LookVector + Vector3.new(0,-3,0) -- Sets The Balls Position Slightly Infront Of The Player On The Ground
 		Ball.Velocity = Player.Character.PrimaryPart.CFrame.LookVector * Power + Vector3.new(0,0,0) -- Sets The Balls Vellocity To What The Player Sets It To
 		Ball.AssemblyAngularVelocity = Player.Character.PrimaryPart.CFrame.LookVector * Vector3.new(Spin,0,Spin) -- Puts Spin On The Ball
-		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + 1 -- Adds To The Bowled Value
+		local hasPass = false -- Makes A Value Named hasPass
+		local passID = 804124589 -- Sets The PassId
+		local Bowled = 1 -- Sets A Bowled Value
+		local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+			hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+		end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+		if hasPass == true then -- Checks If The Player Has The Pass
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- This Doubled The Player The Bowled Value If They Got The Pass
+		if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- Doubled The bowled If The Player Has Premium
+		if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+			Bowled = Bowled * 2 -- Multiplys The Bowled Value
+		end -- If The Player Is In My Group It Multiplys
+		Player.leaderstats.Bowled.Value = Player.leaderstats.Bowled.Value + Bowled -- Adds To The Bowled Value
+		Ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
+			if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
+				toutcher.CanTouch = false -- Disables The Pins Can Toutch
+				local hasPass = false -- Makes A Value Named hasPass
+				local passID = 803810936 -- Sets The PassId
+				local Score = 160 -- Sets A Score Value
+				local success, message = pcall(function() -- Makes Sure The Player Has The Gamepass
+					hasPass = MarketplaceService:UserOwnsGamePassAsync(Player.UserId, passID) -- Actualy Checks
+				end) -- This Actualy Checked If The Player Has The Gamepass And Sets Haspass To It
+				local children = game.Players:GetChildren() -- Gets All The Players
+				if hasPass == true then -- If The Player Has The Pass It Rewards The Player This
+					Score = Score * 2 -- Multiplys The Score
+				end -- Awards The Playe Score Pased On If They Had The pass Or Not
+				if Player.MembershipType == Enum.MembershipType.Premium then -- Checks If The Player Has Premium
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- Doubled The bowled If The Player Has Premium
+				if Player:IsInGroup(33200215) then -- Checks If The Player Is In My Group
+					Score = Score * 2 -- Multiplys The Score Value
+				end -- If The Player Is In My Group It Multiplys
+				for i = 1, #children do -- This Adds Score To All The Players
+					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + Score -- Awards The Score
+				end -- This Awarded The Player Score
+			end -- This Has Awarded The Player Score
+		end) -- This Has Awarded The Player Score
 		if power > 100 then -- If The Power Is Above 100 It Will Enable The Fire And Smoke
 			Ball.Fire.Enabled = true -- Enables Fire
 			Ball.Sound.Value = "Explode" -- Sets A Value To Explosion -- Another Script Takes This Sound And Plays It
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball.Smoke2.Enabled = true -- Enables Smoke
-			wait(2) -- Waits 2 Seconds
+			task.wait(2) -- Waits 2 Seconds
 			Ball:Destroy() -- Destroys Ball
 		elseif power > 90 then -- Else If The Power Is Above 90 Runs The Following Code
 			Ball.Black.Enabled = true -- Enables Black Effects
@@ -359,42 +554,5 @@ game.ReplicatedStorage.Reset.OnServerEvent:Connect(function() -- When The Player
 	workspace.Alley:Destroy() -- Destroys Alley In Workspace
 	local Alley = game.ServerStorage.Alley:Clone() -- Clones An Alley From Server Storage
 	Alley.Parent = workspace -- Sets The Alley's Parent To Workspace
-end)
-workspace.ActiveBalls.ChildAdded:Connect(function(ball) -- When The Folder That Holds The Balls Is Added To It Plays This
-	ball.Touched:Connect(function(toutcher)  -- Finds What This New Ball Toutches
-				if toutcher.Name == "Pin" then -- Checks If The Pin Is Touched Then It Plays This
-					toutcher.CanTouch = false -- Disables The Pins Can Toutch
-					if ball.Name == "Ball1" then -- If The Ball Is Ball 1
-				local children = game.Players:GetChildren() -- Gets All The Players
-				for i = 1, #children do -- This Adds Score To All The Players
-					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 10 -- Awards The Score
-				end -- This Awarded The Player Score Based On The Level Of Ball
-					end -- This Has Awarded The Player 10 Score If They Have Ball 1
-			if ball.Name == "Ball2" then -- If The Ball Is Ball 2
-				local children = game.Players:GetChildren() -- Gets All The Players
-				for i = 1, #children do -- This Adds Score To All The Players
-					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 20 -- Awards The Score
-				end -- This Awarded The Player Score Based On The Level Of Ball
-			end -- This Has Awarded The Player 20 Score If They Have Ball 2
-			if ball.Name == "Ball3" then -- If The Ball Is Ball 3
-				local children = game.Players:GetChildren() -- Gets All The Players
-				for i = 1, #children do -- This Adds Score To All The Players
-					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 30 -- Awards The Score
-				end -- This Awarded The Player Score Based On The Level Of Ball
-			end -- This Has Awarded The Player 30 Score If They Have Ball 3
-			if ball.Name == "Ball4" then -- If The Ball Is Ball 4
-				local children = game.Players:GetChildren() -- Gets All The Players
-				for i = 1, #children do -- This Adds Score To All The Players
-					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 40 -- Awards The Score
-				end -- This Awarded The Player Score Based On The Level Of Ball
-			end -- This Has Awarded The Player 40 Score If They Have Ball 4
-			if ball.Name == "Ball5" then -- If The Ball Is Ball 5
-				local children = game.Players:GetChildren() -- Gets All The Players
-				for i = 1, #children do -- This Adds Score To All The Players
-					children[i].leaderstats.Score.Value = children[i].leaderstats.Score.Value + 50 -- Awards The Score
-				end -- This Awarded The Player Score Based On The Level Of Ball
-			end -- This Has Awarded The Player 50 Score If They Have Ball 5
-				end -- This Has Checked If The Toutcher Is A Pin And If It is it awards the players in the game score based on the ball level			
-	end) -- This Has Awarded The Player Score Based On The Level Of Ball
-end) -- This Has Awarded The Player Score
+end) -- This Has Reset The Alley
 -- Feel Free To Use This Script Although It Might Be Hard To Implement It Because There Are Alot Of Outside Things, Thanks For Reading This And Sorry For Misspelled Words, Grammer, And Capitalization Im Dislexic :P (Dislexia Is A Mental "Deficency" That Makes It Hard For Me To Do Launguage Oriented Things)
